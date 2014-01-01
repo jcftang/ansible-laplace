@@ -19,7 +19,6 @@
         - duplicity
         - s3cmd
         - aria2
-        - sphinx
         - dsocks
         - polipo
         - mobile-shell
@@ -34,6 +33,7 @@
         - coreutils
         - autossh
         - asciidoc
+        - source-highlight
         - fop
         - gsl
         - dos2unix
@@ -94,3 +94,16 @@
     - command: launchctl load {{ home }}/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist
       with_items:
         - polipo
+
+    - pip: executable=/usr/local/bin/pip name={{item}} state=present
+      with_items:
+        - Sphinx
+        - pygments
+        - blockdiag
+        - nwdiag
+        - seqdiag
+        - actdiag
+        - sphinxcontrib-blockdiag
+        - sphinxcontrib-actdiag
+        - sphinxcontrib-nwdiag
+        - sphinxcontrib-seqdiag
