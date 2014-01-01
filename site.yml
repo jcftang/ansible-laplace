@@ -38,13 +38,19 @@
         - gsl
         - dos2unix
         - par2
+        - connect
+        - nmap
+        - sshuttle
+        - mutt
+        - macvim
+        - vim
 
     - command: creates=/usr/local/Cellar/sshpass/1.05/bin/sshpass brew install https://raw.github.com/eugeneoden/homebrew/eca9de1/Library/Formula/sshpass.rb
 
     # haskell related, for git-annex
     - homebrew: name={{item}} state=present
       with_items:
-#- haskell-platform
+        - haskell-platform
         - git
         - ossp-uuid
         - md5sha1sum
@@ -83,9 +89,12 @@
         - fits
         - glib
         - imagemagick
+        - node
 
     - command: creates=/usr/local/lib/libxml2.a brew link libxml2 --force
     - command: creates=/usr/local/lib/libxslt.a brew link libxslt --force
+    - command: creates=/usr/local/bin/msgfmt brew link gettext --force
+    - command: creates=/usr/local/lib/libreadline.a brew link readline --force
 
     - file: src=/usr/local/opt/{{ item }}/homebrew.mxcl.{{ item }}.plist path=~/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist state=link force=yes
       with_items:
@@ -107,3 +116,5 @@
         - sphinxcontrib-actdiag
         - sphinxcontrib-nwdiag
         - sphinxcontrib-seqdiag
+
+    - command: brew linkapps
