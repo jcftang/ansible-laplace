@@ -1,0 +1,96 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+
+  vars:
+    home: /Users/jtang
+
+  tasks:
+    - homebrew: name={{item}} state=present
+      with_items:
+        - ansible
+        - saltstack
+        - keychain
+        - git
+        - git-flow-avh
+        - mercurial
+        - bazaar
+        - fossil
+        - duplicity
+        - s3cmd
+        - aria2
+        - sphinx
+        - dsocks
+        - polipo
+        - mobile-shell
+        - mr
+        - naturaldocs
+        - tmux
+        - fish
+        - python
+        - swig
+        - zeromq
+        - psutils
+        - coreutils
+        - autossh
+        - asciidoc
+        - fop
+        - gsl
+        - dos2unix
+        - par2
+
+    - command: creates=/usr/local/Cellar/sshpass/1.05/bin/sshpass brew install https://raw.github.com/eugeneoden/homebrew/eca9de1/Library/Formula/sshpass.rb
+
+    # haskell related, for git-annex
+    - homebrew: name={{item}} state=present
+      with_items:
+#- haskell-platform
+        - git
+        - ossp-uuid
+        - md5sha1sum
+        - coreutils
+        - gnutls
+        - libidn
+        - gsasl
+        - pkg-config
+        - libxml2
+
+    # dri related
+    - homebrew: name={{item}} state=present
+      with_items:
+        - coreutils
+        - libtool
+        - libksba
+        - libxml2
+        - libxslt
+        - automake
+        - autoconf
+        - openssl
+        - curl
+        - curl-ca-bundle
+        - readline
+        - lzlib
+        - gettext
+        - pkg-config
+        - libyaml
+        - mariadb
+        - redis
+        - clamav
+        - sqlite
+        - ffmpeg
+        - gource
+        - phantomjs
+        - fits
+        - glib
+        - imagemagick
+
+    - command: creates=/usr/local/lib/libxml2.a brew link libxml2 --force
+    - command: creates=/usr/local/lib/libxslt.a brew link libxslt --force
+
+    - file: src=/usr/local/opt/{{ item }}/homebrew.mxcl.{{ item }}.plist path=~/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist state=link force=yes
+      with_items:
+        - polipo
+
+    - command: launchctl load {{ home }}/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist
+      with_items:
+        - polipo
