@@ -41,6 +41,7 @@
         - swig
         - zeromq
         - coreutils
+        - proctools
         - autossh
         - asciidoc
         - source-highlight
