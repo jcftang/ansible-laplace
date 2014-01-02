@@ -40,7 +40,6 @@
         - python
         - swig
         - zeromq
-        - psutils
         - coreutils
         - autossh
         - asciidoc
