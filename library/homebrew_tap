@@ -22,7 +22,7 @@ module: homebrew_tap
 author: Jimmy Tang
 short_description: Add or remove Taps for Homebrew
 description:
-    - Manages Homebrew Tap (additional and or third party repositories)
+    - Manages Homebrew Taps (additional and or third party repositories)
 version_added: "1.5"
 options:
     repo:
