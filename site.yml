@@ -6,17 +6,16 @@
     home: /Users/jtang
 
   tasks:
-    - command: creates=/usr/local/Library/Taps/{{item.tap}}-{{item.flavour}}/README.md brew tap {{item.tap}}/{{item.flavour}}
+    - homebrew_tap: tap={{item}} state=tapped
       with_items:
-        - { tap: homebrew, flavour: apache }
-        - { tap: homebrew, flavour: dupes }
-        - { tap: homebrew, flavour: games }
-        - { tap: homebrew, flavour: python }
-        - { tap: homebrew, flavour: science }
-        - { tap: homebrew, flavour: versions}
-        - { tap: homebrew, flavour: headonly }
-        - { tap: phinze, flavour: cask }
-
+        - homebrew/apache
+        - homebrew/binary
+        - homebrew/dupes
+        - homebrew/games
+        - homebrew/headonly
+        - homebrew/python
+        - homebrew/science
+        - homebrew/versions
 
     - homebrew: name={{item}} state=present
       with_items:
