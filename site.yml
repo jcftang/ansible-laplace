@@ -151,3 +151,7 @@
         - shiftit
         - xquartz
         - pandoc
+        - google-chrome
+        - firefox
+        - opera
+        - vagrant
