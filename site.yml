@@ -146,6 +146,7 @@
 
     - command: brew linkapps
 
+    # applications from casks
     - homebrew: name={{item}} state=present fromcask=yes
       with_items:
         - shiftit
@@ -155,3 +156,11 @@
         - firefox
         - opera
         - vagrant
+        - iterm2
+        - skype
+        - vlc
+        - adium
+        - handbrake
+        - virtualbox
+        - cyberduck
+        - java
