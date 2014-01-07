@@ -69,6 +69,7 @@
         - gnuplot
         - kindlegen
         - wkhtmltopdf
+        - xapian
 
     - command: creates=/usr/local/Cellar/sshpass/1.05/bin/sshpass brew install https://raw.github.com/eugeneoden/homebrew/eca9de1/Library/Formula/sshpass.rb
 
@@ -144,3 +145,9 @@
         - sphinxcontrib-seqdiag
 
     - command: brew linkapps
+
+    - homebrew: name={{item}} state=present fromcask=yes
+      with_items:
+        - shiftit
+        - xquartz
+        - pandoc
