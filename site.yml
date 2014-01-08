@@ -86,6 +86,7 @@
         - gsasl
         - pkg-config
         - libxml2
+        - lsof
 
     # dri related
     - homebrew: name={{item}} state=present
