@@ -143,6 +143,9 @@
         - sphinxcontrib-actdiag
         - sphinxcontrib-nwdiag
         - sphinxcontrib-seqdiag
+        - boto
+        - httplib2
+        - oauth
 
     - command: brew linkapps
 
