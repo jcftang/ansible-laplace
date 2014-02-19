@@ -17,6 +17,7 @@
         - homebrew/science
         - homebrew/versions
         - phinze/cask
+        - caskroom/fonts
 
     - homebrew: name={{item}} state=present
       with_items:
@@ -167,3 +168,4 @@
         - virtualbox
         - cyberduck
         - java
+        - font-dejavu
