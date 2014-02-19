@@ -87,6 +87,7 @@
         - gsasl
         - pkg-config
         - libxml2
+        - lsof
 
     # dri related
     - homebrew: name={{item}} state=present
@@ -119,10 +120,10 @@
         - imagemagick
         - node
 
-    - command: creates=/usr/local/lib/libxml2.a brew link libxml2 --force
-    - command: creates=/usr/local/lib/libxslt.a brew link libxslt --force
-    - command: creates=/usr/local/bin/msgfmt brew link gettext --force
-    - command: creates=/usr/local/lib/libreadline.a brew link readline --force
+#    - command: creates=/usr/local/lib/libxml2.a brew link libxml2 --force
+#    - command: creates=/usr/local/lib/libxslt.a brew link libxslt --force
+#    - command: creates=/usr/local/bin/msgfmt brew link gettext --force
+#    - command: creates=/usr/local/lib/libreadline.a brew link readline --force
 
     - file: src=/usr/local/opt/{{ item }}/homebrew.mxcl.{{ item }}.plist path=~/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist state=link force=yes
       with_items:
@@ -169,3 +170,6 @@
         - cyberduck
         - java
         - font-dejavu
+        - chicken
+        - ccleaner
+        - filezilla
