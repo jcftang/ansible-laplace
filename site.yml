@@ -18,6 +18,7 @@
         - homebrew/versions
         - phinze/cask
         - jcftang/jcftang
+        - caskroom/fonts
 
     - homebrew: name={{item}} state=present
       with_items:
@@ -145,6 +146,9 @@
         - sphinxcontrib-actdiag
         - sphinxcontrib-nwdiag
         - sphinxcontrib-seqdiag
+        - boto
+        - httplib2
+        - oauth
 
     - command: brew linkapps
 
@@ -166,6 +170,7 @@
         - virtualbox
         - cyberduck
         - java
+        - font-dejavu
         - chicken
         - ccleaner
         - filezilla
