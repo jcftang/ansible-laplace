@@ -17,6 +17,7 @@
         - homebrew/science
         - homebrew/versions
         - phinze/cask
+        - jcftang/jcftang
 
     - homebrew: name={{item}} state=present
       with_items:
