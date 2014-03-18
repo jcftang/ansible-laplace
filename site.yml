@@ -6,7 +6,7 @@
     home: /Users/jtang
 
   tasks:
-    - homebrew_tap: tap={{item}} state=tapped
+    - homebrew_tap: tap={{item}} state=present
       with_items:
         - homebrew/apache
         - homebrew/binary
@@ -154,7 +154,7 @@
     - command: brew linkapps
 
     # applications from casks
-    - homebrew: name={{item}} state=present fromcask=yes
+    - homebrew_cask: name={{item}} state=present
       with_items:
         - shiftit
         - xquartz
