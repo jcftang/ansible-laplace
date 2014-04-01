@@ -73,6 +73,8 @@
         - wkhtmltopdf
         - xapian
         - tmpreaper
+        - poppler
+        - stgit
 
     - command: creates=/usr/local/Cellar/sshpass/1.05/bin/sshpass brew install https://raw.github.com/eugeneoden/homebrew/eca9de1/Library/Formula/sshpass.rb
 
@@ -150,6 +152,7 @@
         - boto
         - httplib2
         - oauth
+        - git-review
 
     - command: brew linkapps
 
