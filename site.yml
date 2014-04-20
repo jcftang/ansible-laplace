@@ -153,6 +153,8 @@
         - httplib2
         - oauth
         - git-review
+        - fig
+        - docker-py
 
     - command: brew linkapps
 
