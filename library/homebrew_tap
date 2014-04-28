@@ -1,132 +1,215 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Jimmy Tang <jcftang@gmail.com>
+# (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Based on homebrew (Andrew Dunham <andrew@du.nham.ca>)
 #
-# This module is free software: you can redistribute it and/or modify
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# This software is distributed in the hope that it will be useful,
+# Ansible is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+import re
 
 DOCUMENTATION = '''
 ---
 module: homebrew_tap
-author: Jimmy Tang
-short_description: Add or remove Taps for Homebrew
+author: Daniel Jaouen
+short_description: Tap a Homebrew repository.
 description:
-    - Manages Homebrew Taps (additional and or third party repositories)
-version_added: "1.5"
+    - Tap external Homebrew repositories.
+version_added: "1.6"
 options:
-    repo:
+    tap:
         description:
-            - A source string for the tap
+            - The repository to tap.
         required: true
     state:
         description:
-            - state of the tap
+            - state of the repository.
         choices: [ 'present', 'absent' ]
         required: false
-        default: present
-notes:  []
+        default: 'present'
+requirements: [ homebrew ]
 '''
+
 EXAMPLES = '''
-- homebrew_tap: repo=phinze/cask state=present
-- homebrew_tap: repo=homebrew/version state=absent
+homebrew_tap: tap=homebrew/dupes state=present
+homebrew_tap: tap=homebrew/dupes state=absent
+homebrew_tap: tap=homebrew/dupes,homebrew/science state=present
 '''
 
-def query_repos(module, brew_path, repo, state="present"):
-    """ Returns whether a repo is installed or not. """
 
-    if state == "present":
-        rc, out, err = module.run_command("%s tap | grep -q '^%s$'" % (brew_path, repo))
-        if rc == 0:
-            return True
-
-        return False
+def a_valid_tap(tap):
+    '''Returns True if the tap is valid.'''
+    regex = re.compile(r'^(\S+)/(homebrew-)?(\w+)$')
+    return regex.match(tap)
 
 
-def remove_repos(module, brew_path, repos):
-    """ Uninstalls one or more repos if installed. """
+def already_tapped(module, brew_path, tap):
+    '''Returns True if already tapped.'''
 
-    removed_count = 0
-
-    # Using a for loop incase of error, we can report the repo that failed
-    for repo in repos:
-        # Query the repo first, to see if we even need to remove.
-        if not query_repos(module, brew_path, repo):
-            continue
-
-        if module.check_mode:
-            module.exit_json(changed=True)
-        rc, out, err = module.run_command([brew_path, 'untap', repo])
-
-        if query_repos(module, brew_path, repo):
-            module.fail_json(msg="failed to remove %s: %s" % (repo, out.strip()))
-
-        removed_count += 1
-
-    if removed_count > 0:
-        module.exit_json(changed=True, msg="removed %d repo(s)" % removed_count)
-
-    module.exit_json(changed=False, msg="repo(s) already absent")
+    rc, out, err = module.run_command([
+        brew_path,
+        'tap',
+    ])
+    taps = [tap_.strip().lower() for tap_ in out.split('\n') if tap_]
+    return tap.lower() in taps
 
 
-def install_repos(module, brew_path, repos):
-    """ Installs one or more repos if not already installed. """
+def add_tap(module, brew_path, tap):
+    '''Adds a single tap.'''
+    failed, changed, msg = False, False, ''
 
-    installed_count = 0
+    if not a_valid_tap(tap):
+        failed = True
+        msg = 'not a valid tap: %s' % tap
 
-    for repo in repos:
-        if query_repos(module, brew_path, repo):
-            continue
-
+    elif not already_tapped(module, brew_path, tap):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        cmd = [brew_path, 'tap', repo]
-        rc, out, err = module.run_command(cmd)
+        rc, out, err = module.run_command([
+            brew_path,
+            'tap',
+            tap,
+        ])
+        if already_tapped(module, brew_path, tap):
+            changed = True
+            msg = 'successfully tapped: %s' % tap
+        else:
+            failed = True
+            msg = 'failed to tap: %s' % tap
 
-        if not query_repos(module, brew_path, repo):
-            module.fail_json(msg="failed to install %s: '%s' %s" % (repo, cmd, out.strip()))
+    else:
+        msg = 'already tapped: %s' % tap
 
-        installed_count += 1
+    return (failed, changed, msg)
 
-    if installed_count > 0:
-        module.exit_json(changed=True, msg="installed %d repo(s)" % (installed_count,))
 
-    module.exit_json(changed=False, msg="repo(s) already present")
+def add_taps(module, brew_path, taps):
+    '''Adds one or more taps.'''
+    failed, unchanged, added, msg = False, 0, 0, ''
+
+    for tap in taps:
+        (failed, changed, msg) = add_tap(module, brew_path, tap)
+        if failed:
+            break
+        if changed:
+            added += 1
+        else:
+            unchanged += 1
+
+    if failed:
+        msg = 'added: %d, unchanged: %d, error: ' + msg
+        msg = msg % (added, unchanged)
+    elif added:
+        changed = True
+        msg = 'added: %d, unchanged: %d' % (added, unchanged)
+    else:
+        msg = 'added: %d, unchanged: %d' % (added, unchanged)
+
+    return (failed, changed, msg)
+
+
+def remove_tap(module, brew_path, tap):
+    '''Removes a single tap.'''
+    failed, changed, msg = False, False, ''
+
+    if not a_valid_tap(tap):
+        failed = True
+        msg = 'not a valid tap: %s' % tap
+
+    elif already_tapped(module, brew_path, tap):
+        if module.check_mode:
+            module.exit_json(changed=True)
+
+        rc, out, err = module.run_command([
+            brew_path,
+            'untap',
+            tap,
+        ])
+        if not already_tapped(module, brew_path, tap):
+            changed = True
+            msg = 'successfully untapped: %s' % tap
+        else:
+            failed = True
+            msg = 'failed to untap: %s' % tap
+
+    else:
+        msg = 'already untapped: %s' % tap
+
+    return (failed, changed, msg)
+
+
+def remove_taps(module, brew_path, taps):
+    '''Removes one or more taps.'''
+    failed, unchanged, removed, msg = False, 0, 0, ''
+
+    for tap in taps:
+        (failed, changed, msg) = remove_tap(module, brew_path, tap)
+        if failed:
+            break
+        if changed:
+            removed += 1
+        else:
+            unchanged += 1
+
+    if failed:
+        msg = 'removed: %d, unchanged: %d, error: ' + msg
+        msg = msg % (removed, unchanged)
+    elif removed:
+        changed = True
+        msg = 'removed: %d, unchanged: %d' % (removed, unchanged)
+    else:
+        msg = 'removed: %d, unchanged: %d' % (removed, unchanged)
+
+    return (failed, changed, msg)
 
 
 def main():
     module = AnsibleModule(
-        argument_spec = dict(
-            repo = dict(aliases=["name", "tap"], required=True),
-            state = dict(default="present", choices=["present", "installed", "tapped", "absent", "removed", "untapped"]),
+        argument_spec=dict(
+            name=dict(aliases=['tap'], required=True),
+            state=dict(default='present', choices=['present', 'absent']),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    p = module.params
+    brew_path = module.get_bin_path(
+        'brew',
+        required=True,
+        opt_dirs=['/usr/local/bin']
+    )
 
-    brew_path = module.get_bin_path('brew', True, ['/usr/local/bin'])
+    taps = module.params['name'].split(',')
 
-    repos = p["repo"].split(",")
+    if module.params['state'] == 'present':
+        failed, changed, msg = add_taps(module, brew_path, taps)
 
-    if p["state"] in ["present", "installed", "tapped"]:
-        install_repos(module, brew_path, repos)
+        if failed:
+            module.fail_json(msg=msg)
+        else:
+            module.exit_json(changed=changed, msg=msg)
 
-    elif p["state"] in ["absent", "removed", "untapped"]:
-        remove_repos(module, brew_path, repos)
+    elif module.params['state'] == 'absent':
+        failed, changed, msg = remove_taps(module, brew_path, taps)
 
-# import module snippets
-from ansible.module_utils.basic import *
+        if failed:
+            module.fail_json(msg=msg)
+        else:
+            module.exit_json(changed=changed, msg=msg)
 
+# this is magic, see lib/ansible/module_common.py
+#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
 main()
