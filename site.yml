@@ -34,7 +34,7 @@
         - s3cmd
         - aria2
         - dsocks
-        - polipo
+        #- polipo
         - mobile-shell
         - mr
         - naturaldocs
@@ -52,7 +52,7 @@
         - gsl114
         - dos2unix
         - par2
-        - connect
+        #- connect
         - nmap
         - sshuttle
         - mutt
@@ -67,10 +67,10 @@
         #- binutils
         - socat
         - rsync
-        - bbcp
+        #- bbcp
         - gnuplot
         - kindlegen
-        - wkhtmltopdf
+        #- wkhtmltopdf
         - xapian
         - tmpreaper
         - ipcalc
@@ -83,7 +83,8 @@
     # haskell related, for git-annex
     - homebrew: name={{item}} state=present
       with_items:
-        - haskell-platform
+        - libiconv
+        #- haskell-platform
         - git
         - ossp-uuid
         - md5sha1sum
@@ -93,7 +94,7 @@
         - gsasl
         - pkg-config
         - libxml2
-        - lsof
+        #- lsof
 
     # dri related
     - homebrew: name={{item}} state=present
@@ -108,7 +109,6 @@
         - autoconf
         - openssl
         - curl
-        - curl-ca-bundle
         - readline
         - lzlib
         - gettext
@@ -131,13 +131,13 @@
 #    - command: creates=/usr/local/bin/msgfmt brew link gettext --force
 #    - command: creates=/usr/local/lib/libreadline.a brew link readline --force
 
-    - file: src=/usr/local/opt/{{ item }}/homebrew.mxcl.{{ item }}.plist path=~/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist state=link force=yes
-      with_items:
-        - polipo
+    #- file: src=/usr/local/opt/{{ item }}/homebrew.mxcl.{{ item }}.plist path=~/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist state=link force=yes
+    #  with_items:
+    #    - polipo
 
-    - command: launchctl load {{ home }}/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist
-      with_items:
-        - polipo
+    #- command: launchctl load {{ home }}/Library/LaunchAgents/homebrew.mxcl.{{ item }}.plist
+    #  with_items:
+    #    - polipo
 
     - pip: executable=/usr/local/bin/pip name={{item}} state=present
       with_items:
@@ -186,3 +186,5 @@
         - android-file-transfer
         - julia
         - atom
+        - spotify
+        - cog
